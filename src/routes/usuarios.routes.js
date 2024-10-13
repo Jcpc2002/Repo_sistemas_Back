@@ -1,12 +1,13 @@
 import { Router } from "express";
 import {postUsuarios, Postlogin,editarDatos,
     editarContrasena,filtrarDocumentos
-    ,filtrarDocumentosPorCategoria,filtrarDocumentoPorID,cantidadDeDocumentos} from "../controllers/usuario.controllers.js"
+    ,filtrarDocumentosPorCategoria,filtrarDocumentoPorID,cantidadDeDocumentos,enviarSolicitud,traerSolicitudesPendientes,traerSolicitudesAceptadas,enviarCorreo, subirArchivo} from "../controllers/usuario.controllers.js"
 import {generarInforme} from "../controllers/pdf.controllers.js"
 import{categoria,editarCategoria,editarDocumento,
     eliminarDocumento,insertarDocumento,traerCategorias,
     eliminarCategoria,traerCategoriasPorId} from "../controllers/documento.controllers.js"
 import {incrementarVisitas} from "../controllers/index.controller.js"
+//import EnviarSolicitud from "../../../Front-soft/src/pages/EnviarSolicitud.jsx";
 const router = Router()
 
 router.post('/login', Postlogin) //login
@@ -45,8 +46,14 @@ router.post('/filtrarDocumentoPorID',filtrarDocumentoPorID )//filtra documento s
 
 router.get('/cantidadDeDocumentos',cantidadDeDocumentos )//cuenta la cantidad de documentos
 
+router.post('/enviarSolicitud',enviarSolicitud)//usuario particular envia solicitudes
 
+router.get('/traerSolicitudesPendientes',traerSolicitudesPendientes)//llama todas las solicitudes pendientes
 
+router.get('/traerSolicitudesAceptadas',traerSolicitudesAceptadas)//llama todas las solicitudes aceptadas
 
+router.post('/enviarCorreo',enviarCorreo)//enviar correo al usuario cuya solicitud ha sido aceptada
+
+router.put('/subirArchivo',subirArchivo)//el usuario particular sube un archivo para revisar
 
 export default router

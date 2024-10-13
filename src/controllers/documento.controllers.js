@@ -46,7 +46,7 @@ export const insertarDocumento = async (req, res) => {
 
         res.status(200).json({ message: 'Documento insertado con éxito', nombre, tipodocumento, descripcion, miembros, archivos, estado, fechasubida, semestre });
     } catch (error) {
-        console.error('Error al actualizar los datos:', error);
+        console.error('Error al subir documento:', error);
 
         // Aquí capturamos el error específico de clave duplicada.
         if (error.code === "ER_DUP_ENTRY" || error.errno === 1062) {

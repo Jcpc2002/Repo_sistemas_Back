@@ -1,6 +1,6 @@
 import { pool } from "../db.js";
 import databaseError from "../middlewares/error.js";
-
+import nodemailer from 'nodemailer';
 
 //Login
 export const Postlogin = async (req, res) => {
@@ -284,3 +284,114 @@ export const cantidadDeDocumentos = async (req, res) => {
     return res.status(500).json({ message: dbError.message });
   }
 };
+
+export const enviarSolicitud = async (req, res) => {
+
+  try {
+    const {nombre, codigousuario, correo, descripcion, } = req.body;
+    const estado = 0;
+    // Verificar si el usuario ya envio una solicitud
+    const [existingRows] = await pool.query('SELECT id FROM solicitud WHERE codigousuario = ?', [codigousuario]);
+    if (existingRows.length > 0) {
+        return res.status(409).json({ message: 'El usuario ya envio una solicitud.' });
+    }
+
+    // Si no existe, proceder con la inserción
+    const [rows] = await pool.query('INSERT INTO solicitud (nombre, codigousuario, descripcion,estado, correo) VALUES (?, ?, ?, ?, ?)',
+        [nombre, codigousuario, descripcion, estado, correo]);
+
+        res.status(200).json({ message: 'Solicitud enviada'});
+} catch (error) {
+    console.error('Error al enviar solicitud:', error);
+
+    // Manejo genérico de errores de base de datos
+    const dbError = new Error('Error interno del servidor al realizar la consulta');
+    return res.status(500).json({ message: dbError.message });
+}
+}
+
+export const traerSolicitudesPendientes = async (req, res) => {
+
+  try {
+    const [rows] = await pool.query("SELECT * FROM solicitud WHERE estado = 0");
+    res.json({ message: "Solicitudes encontradas", data: rows });
+} catch (error) {
+    console.error("Error al traer las solicitudes:", error);
+
+    // Manejo genérico de otros errores de base de datos
+    const dbError = new databaseError(
+        "Error interno del servidor al realizar la consulta",
+        error.code || error.errno
+    );
+    return res.status(500).json({ message: dbError.message });
+}
+}
+
+export const traerSolicitudesAceptadas = async (req, res) => {
+  try {
+    const [rows] = await pool.query("SELECT * FROM solicitud WHERE estado = 1");
+    res.json({ message: "Solicitudes encontradas", data: rows });
+} catch (error) {
+    console.error("Error al traer las solicitudes:", error);
+
+    // Manejo genérico de otros errores de base de datos
+    const dbError = new databaseError(
+        "Error interno del servidor al realizar la consulta",
+        error.code || error.errno
+    );
+    return res.status(500).json({ message: dbError.message });
+}
+
+}
+
+export const enviarCorreo = async (req, res) => {
+  const { correo, codigo, nombre } = req.body;
+  // Configura el transporte de correo
+  const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+      user: 'repositorioayd@gmail.com',
+      pass: 'crok zxgf ychi cxtj',
+    },
+  });
+
+  const mailOptions = {
+    from: 'repositorioayd@gmail.com',
+    to: correo,
+    subject: 'Solicitud Aceptada',
+    text: 'Tu solicitud ha sido aceptada. Envia tu archivo a traves de este link: http://localhost:5173/enviar.',
+  };
+
+  const [resultsubida] = await pool.query(
+    'UPDATE solicitud SET estado = 1 WHERE codigousuario = ?',
+    [codigo]
+);
+
+
+  try {
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({ message: 'Correo enviado exitosamente' });
+  } catch (error) {
+    console.error('Error al enviar el correo:', error);
+    res.status(500).json({ message: 'Error al enviar el correo' });
+  }
+};
+
+
+export const subirArchivo = async (req, res) =>{
+  const { codigo, archivo } = req.body;
+
+  const [rows] = await pool.query('SELECT * FROM solicitud WHERE codigousuario = ?', [codigo]);
+
+  if (rows.length === 0) {
+    return res.status(404).json({ message: 'El código no esta en la base de datos' });
+  }
+  
+  const [resultsubida] = await pool.query(
+    'UPDATE solicitud SET archivo = ? WHERE codigousuario = ?',
+    [archivo, codigo]
+  );
+
+  res.status(200).json({ message: 'Archivo subido con éxito' });
+
+}
