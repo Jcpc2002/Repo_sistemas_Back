@@ -1,7 +1,7 @@
 import { Router } from "express";
 import {postUsuarios, Postlogin,editarDatos,
     editarContrasena,filtrarDocumentos
-    ,filtrarDocumentosPorCategoria,filtrarDocumentoPorID,cantidadDeDocumentos,enviarSolicitud,traerSolicitudesPendientes,traerSolicitudesAceptadas,enviarCorreo, subirArchivo} from "../controllers/usuario.controllers.js"
+    ,filtrarDocumentosPorCategoria,filtrarDocumentoPorID,cantidadDeDocumentos,enviarSolicitud,traerSolicitudesPendientes,traerSolicitudesAceptadas,enviarCorreo, subirArchivo,rachazarSolicitud} from "../controllers/usuario.controllers.js"
 import {generarInforme} from "../controllers/pdf.controllers.js"
 import{categoria,editarCategoria,editarDocumento,
     eliminarDocumento,insertarDocumento,traerCategorias,
@@ -55,5 +55,7 @@ router.get('/traerSolicitudesAceptadas',traerSolicitudesAceptadas)//llama todas 
 router.post('/enviarCorreo',enviarCorreo)//enviar correo al usuario cuya solicitud ha sido aceptada
 
 router.put('/subirArchivo',subirArchivo)//el usuario particular sube un archivo para revisar
+
+router.delete('/rechazarSolicitud',rachazarSolicitud)//el admin rechaza una solicitud
 
 export default router

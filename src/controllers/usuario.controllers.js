@@ -395,3 +395,31 @@ export const subirArchivo = async (req, res) =>{
   res.status(200).json({ message: 'Archivo subido con éxito' });
 
 }
+
+export const rachazarSolicitud = async (req, res)=>{
+
+  const codigo = req.body;
+
+    try {
+        // Iniciar una transacción
+        await pool.query('START TRANSACTION');
+
+        // Eliminar los documentos asociados al tipodocumento
+        await pool.query('DELETE FROM solicitud WHERE codigousuario = ?', [codigo]);
+
+        // Confirmar la transacción
+        await pool.query('COMMIT');
+
+        res.status(200).json({ message: 'Eliminado con éxito' });
+    } catch (error) {
+        console.error('Error al eliminar los datos:', error);
+
+        // Revertir la transacción en caso de error
+        await pool.query('ROLLBACK');
+
+        // Manejo genérico de otros errores de base de datos
+        const dbError = new Error('Error interno del servidor al realizar la consulta');
+        return res.status(500).json({ message: dbError.message });
+    }
+
+}
