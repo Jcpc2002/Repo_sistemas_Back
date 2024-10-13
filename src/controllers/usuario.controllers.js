@@ -440,9 +440,9 @@ export const subirArchivo = async (req, res) => {
   res.status(200).json({ message: "Archivo subido con éxito" });
 };
 
-export const rachazarSolicitud = async (req, res) => {
-  const codigousuario = req.body;
-
+export const rechazarSolicitud = async (req, res) => {
+  const { codigousuario } = req.body; 
+  console.log(codigousuario);
   try {
     await pool.query("DELETE FROM solicitud WHERE codigousuario = ?", [codigousuario]);
 
@@ -460,3 +460,4 @@ export const rachazarSolicitud = async (req, res) => {
     return res.status(500).json({ message: dbError.message });
   }
 };
+
