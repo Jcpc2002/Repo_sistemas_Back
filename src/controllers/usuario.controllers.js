@@ -440,7 +440,7 @@ export const subirArchivo = async (req, res) => {
   res.status(200).json({ message: "Archivo subido con éxito" });
 };
 
-export const rechazarSolicitud = async (req, res) => {
+export const rachazarSolicitud = async (req, res) => {
   const { codigousuario } = req.body; 
   console.log(codigousuario);
   try {
