@@ -1,6 +1,6 @@
 import { pool } from "../db.js";
 import databaseError from "../middlewares/error.js";
-import nodemailer from 'nodemailer';
+import nodemailer from "nodemailer";
 
 //Login
 export const Postlogin = async (req, res) => {
@@ -11,13 +11,16 @@ export const Postlogin = async (req, res) => {
   let correo;
   let nombre;
   let fotoPerfil;
-  console.log(req.body)
+  console.log(req.body);
   try {
     const code = req.body.codigo;
     const user = req.body.correo;
     const pass = req.body.contrasena;
-    const results = await connection.query('SELECT * FROM administrador WHERE codigo = ? AND correo = ? AND contrasena = ?', [code, user, pass])
-    console.log(results[0][0])
+    const results = await connection.query(
+      "SELECT * FROM administrador WHERE codigo = ? AND correo = ? AND contrasena = ?",
+      [code, user, pass]
+    );
+    console.log(results[0][0]);
     if (results[0].length >= 1) {
       // El usuario se autenticó correctamente
       autenticado = true;
@@ -29,20 +32,25 @@ export const Postlogin = async (req, res) => {
       //borrable a futuro el isadmin
 
       res.status(200).json({
-        message: 'loggeado con éxito',
-        autenticado: autenticado, nombre: nombre,
-        correo: correo, codigo: codigo, fotoPerfil: fotoPerfil
-      })
-
+        message: "loggeado con éxito",
+        autenticado: autenticado,
+        nombre: nombre,
+        correo: correo,
+        codigo: codigo,
+        fotoPerfil: fotoPerfil,
+      });
     } else {
       // Las credenciales son incorrectas
       console.log("Credenciales incorrectas");
-      res.status(401).json({ message: "Credenciales incorrectas", autenticado: autenticado });
-
+      res
+        .status(401)
+        .json({
+          message: "Credenciales incorrectas",
+          autenticado: autenticado,
+        });
     }
-
   } catch (error) {
-    console.error('Error de consulta:', error);
+    console.error("Error de consulta:", error);
 
     const dbError = new databaseError(
       "Error interno del servidor al realizar la consulta",
@@ -54,16 +62,21 @@ export const Postlogin = async (req, res) => {
 //Insertar usuario administrador
 export const postUsuarios = async (req, res) => {
   try {
-    const { codigo, correo, nombre } = req.body
-    const [rows] = await pool.query('INSERT INTO administrador (codigo,correo,contrasena,nombre) VALUES (?,?,?,?)',
-      [codigo, correo, codigo, nombre])
-    res.send("Usuario insertado" + {
-      id: rows.insertId,
-      nombre,
-      codigo
-    })
+    const { codigo, correo, nombre } = req.body;
+    const [rows] = await pool.query(
+      "INSERT INTO administrador (codigo,correo,contrasena,nombre) VALUES (?,?,?,?)",
+      [codigo, correo, codigo, nombre]
+    );
+    res.send(
+      "Usuario insertado" +
+        {
+          id: rows.insertId,
+          nombre,
+          codigo,
+        }
+    );
   } catch (error) {
-    console.error('Error al subir usuarios:', error);
+    console.error("Error al subir usuarios:", error);
 
     // Aquí capturamos el error específico de clave duplicada.
     if (error.code === "ER_DUP_ENTRY" || error.errno === 1062) {
@@ -101,12 +114,15 @@ export const editarDatos = async (req, res) => {
   try {
     // Consulta de actualización
     const [updateResult] = await pool.query(
-      'UPDATE administrador SET nombre = IFNULL(?, nombre), correo = IFNULL(?, correo), fotoPerfil = IFNULL(?, fotoPerfil) WHERE codigo = ?',
+      "UPDATE administrador SET nombre = IFNULL(?, nombre), correo = IFNULL(?, correo), fotoPerfil = IFNULL(?, fotoPerfil) WHERE codigo = ?",
       [nombre, correo, fotoPerfil, codigo]
     );
 
     // Consulta para obtener los datos actualizados
-    const [datos] = await pool.query('SELECT * FROM administrador WHERE codigo = ?', [codigo]);
+    const [datos] = await pool.query(
+      "SELECT * FROM administrador WHERE codigo = ?",
+      [codigo]
+    );
 
     if (datos.length >= 1) {
       // Datos nuevos que actualiza el usuario
@@ -115,23 +131,27 @@ export const editarDatos = async (req, res) => {
       fotoPerfil = datos[0].fotoPerfil;
     }
 
-    res.status(200).json({ message: 'Actualizado con éxito', nombre, correo, fotoPerfil });
+    res
+      .status(200)
+      .json({ message: "Actualizado con éxito", nombre, correo, fotoPerfil });
   } catch (error) {
-    console.error('Error al actualizar los datos:', error);
+    console.error("Error al actualizar los datos:", error);
 
     // Aquí capturamos el error específico de clave duplicada.
     if (error.code === "ER_DUP_ENTRY" || error.errno === 1062) {
-      const dbError = new Error('El código de usuario ya existe en la base de datos.');
+      const dbError = new Error(
+        "El código de usuario ya existe en la base de datos."
+      );
       return res.status(409).json({ message: dbError.message });
     }
 
     // Manejo genérico de otros errores de base de datos
-    const dbError = new Error('Error interno del servidor al realizar la consulta');
+    const dbError = new Error(
+      "Error interno del servidor al realizar la consulta"
+    );
     return res.status(500).json({ message: dbError.message });
   }
 };
-
-
 
 export const editarContrasena = async (req, res) => {
   const { contrasena, codigo } = req.body;
@@ -139,21 +159,29 @@ export const editarContrasena = async (req, res) => {
   console.log(req.body);
   try {
     // Verificar si el código existe
-    const [rows] = await pool.query('SELECT * FROM administrador WHERE codigo = ?', [codigo]);
+    const [rows] = await pool.query(
+      "SELECT * FROM administrador WHERE codigo = ?",
+      [codigo]
+    );
 
     if (rows.length === 0) {
-      return res.status(404).json({ message: 'Código incorrecto' });
+      return res.status(404).json({ message: "Código incorrecto" });
     }
 
     // Consulta de actualización
-    await pool.query('UPDATE administrador SET contrasena = IFNULL(?, contrasena) WHERE codigo = ?', [contrasena, codigo]);
+    await pool.query(
+      "UPDATE administrador SET contrasena = IFNULL(?, contrasena) WHERE codigo = ?",
+      [contrasena, codigo]
+    );
 
-    res.status(200).json({ rta: 'Contraseña actualizada' });
+    res.status(200).json({ rta: "Contraseña actualizada" });
   } catch (error) {
-    console.error('Error al actualizar los datos:', error);
+    console.error("Error al actualizar los datos:", error);
 
     // Manejo genérico de otros errores de base de datos
-    const dbError = new Error('Error interno del servidor al realizar la consulta');
+    const dbError = new Error(
+      "Error interno del servidor al realizar la consulta"
+    );
     return res.status(500).json({ message: dbError.message });
   }
 };
@@ -176,19 +204,21 @@ export const filtrarDocumentos = async (req, res) => {
 
     if (result.length === 0) {
       return res.status(404).json({
-        message: "No se encontró nada por esta búsqueda"
+        message: "No se encontró nada por esta búsqueda",
       });
     }
 
     res.status(200).json({
       message: "Documentos encontrados",
-      documentos: result
+      documentos: result,
     });
   } catch (error) {
-    console.error('Error al buscar los documentos:', error);
+    console.error("Error al buscar los documentos:", error);
 
     // Manejo genérico de otros errores de base de datos
-    const dbError = new Error('Error interno del servidor al realizar la consulta');
+    const dbError = new Error(
+      "Error interno del servidor al realizar la consulta"
+    );
     return res.status(500).json({ message: dbError.message });
   }
 };
@@ -208,19 +238,21 @@ export const filtrarDocumentosPorCategoria = async (req, res) => {
 
     if (result.length === 0) {
       return res.status(404).json({
-        message: "No se encontró nada por esta búsqueda"
+        message: "No se encontró nada por esta búsqueda",
       });
     }
 
     res.status(200).json({
       message: "Documentos encontrados",
-      documentos: result
+      documentos: result,
     });
   } catch (error) {
-    console.error('Error al buscar los documentos:', error);
+    console.error("Error al buscar los documentos:", error);
 
     // Manejo genérico de otros errores de base de datos
-    const dbError = new Error('Error interno del servidor al realizar la consulta');
+    const dbError = new Error(
+      "Error interno del servidor al realizar la consulta"
+    );
     return res.status(500).json({ message: dbError.message });
   }
 };
@@ -240,19 +272,21 @@ export const filtrarDocumentoPorID = async (req, res) => {
 
     if (result.length === 0) {
       return res.status(404).json({
-        message: "No se encontró nada por esta búsqueda"
+        message: "No se encontró nada por esta búsqueda",
       });
     }
 
     res.status(200).json({
       message: "Documentos encontrados",
-      documentos: result
+      documentos: result,
     });
   } catch (error) {
-    console.error('Error al buscar los documentos:', error);
+    console.error("Error al buscar los documentos:", error);
 
     // Manejo genérico de otros errores de base de datos
-    const dbError = new Error('Error interno del servidor al realizar la consulta');
+    const dbError = new Error(
+      "Error interno del servidor al realizar la consulta"
+    );
     return res.status(500).json({ message: dbError.message });
   }
 };
@@ -260,7 +294,7 @@ export const filtrarDocumentoPorID = async (req, res) => {
 export const cantidadDeDocumentos = async (req, res) => {
   try {
     // Consulta para buscar el dato en múltiples campos
-    console.log('Ejecutando consulta de cantidad total de proyectos...');
+    console.log("Ejecutando consulta de cantidad total de proyectos...");
     const [totalProyectos] = await pool.query(`
     SELECT COUNT(*) AS cantidadTotalDeProyectos
     FROM documento
@@ -268,158 +302,161 @@ export const cantidadDeDocumentos = async (req, res) => {
 
     if (totalProyectos.length === 0) {
       return res.status(404).json({
-        message: "No se encontró nada por esta búsqueda"
+        message: "No se encontró nada por esta búsqueda",
       });
     }
 
     res.status(200).json({
       message: "cantidad encontrada",
-      documentos: totalProyectos[0].cantidadTotalDeProyectos
+      documentos: totalProyectos[0].cantidadTotalDeProyectos,
     });
   } catch (error) {
-    console.error('Error al buscar los documentos:', error);
+    console.error("Error al buscar los documentos:", error);
 
     // Manejo genérico de otros errores de base de datos
-    const dbError = new Error('Error interno del servidor al realizar la consulta');
+    const dbError = new Error(
+      "Error interno del servidor al realizar la consulta"
+    );
     return res.status(500).json({ message: dbError.message });
   }
 };
 
 export const enviarSolicitud = async (req, res) => {
-
   try {
-    const {nombre, codigousuario, correo, descripcion, } = req.body;
+    const { nombre, codigousuario, correo, descripcion } = req.body;
     const estado = 0;
     // Verificar si el usuario ya envio una solicitud
-    const [existingRows] = await pool.query('SELECT id FROM solicitud WHERE codigousuario = ?', [codigousuario]);
+    const [existingRows] = await pool.query(
+      "SELECT id FROM solicitud WHERE codigousuario = ?",
+      [codigousuario]
+    );
     if (existingRows.length > 0) {
-        return res.status(409).json({ message: 'El usuario ya envio una solicitud.' });
+      return res
+        .status(409)
+        .json({ message: "El usuario ya envio una solicitud." });
     }
 
     // Si no existe, proceder con la inserción
-    const [rows] = await pool.query('INSERT INTO solicitud (nombre, codigousuario, descripcion,estado, correo) VALUES (?, ?, ?, ?, ?)',
-        [nombre, codigousuario, descripcion, estado, correo]);
+    const [rows] = await pool.query(
+      "INSERT INTO solicitud (nombre, codigousuario, descripcion,estado, correo) VALUES (?, ?, ?, ?, ?)",
+      [nombre, codigousuario, descripcion, estado, correo]
+    );
 
-        res.status(200).json({ message: 'Solicitud enviada'});
-} catch (error) {
-    console.error('Error al enviar solicitud:', error);
+    res.status(200).json({ message: "Solicitud enviada" });
+  } catch (error) {
+    console.error("Error al enviar solicitud:", error);
 
     // Manejo genérico de errores de base de datos
-    const dbError = new Error('Error interno del servidor al realizar la consulta');
+    const dbError = new Error(
+      "Error interno del servidor al realizar la consulta"
+    );
     return res.status(500).json({ message: dbError.message });
-}
-}
+  }
+};
 
 export const traerSolicitudesPendientes = async (req, res) => {
-
   try {
     const [rows] = await pool.query("SELECT * FROM solicitud WHERE estado = 0");
     res.json({ message: "Solicitudes encontradas", data: rows });
-} catch (error) {
+  } catch (error) {
     console.error("Error al traer las solicitudes:", error);
 
     // Manejo genérico de otros errores de base de datos
     const dbError = new databaseError(
-        "Error interno del servidor al realizar la consulta",
-        error.code || error.errno
+      "Error interno del servidor al realizar la consulta",
+      error.code || error.errno
     );
     return res.status(500).json({ message: dbError.message });
-}
-}
+  }
+};
 
 export const traerSolicitudesAceptadas = async (req, res) => {
   try {
     const [rows] = await pool.query("SELECT * FROM solicitud WHERE estado = 1");
     res.json({ message: "Solicitudes encontradas", data: rows });
-} catch (error) {
+  } catch (error) {
     console.error("Error al traer las solicitudes:", error);
 
     // Manejo genérico de otros errores de base de datos
     const dbError = new databaseError(
-        "Error interno del servidor al realizar la consulta",
-        error.code || error.errno
+      "Error interno del servidor al realizar la consulta",
+      error.code || error.errno
     );
     return res.status(500).json({ message: dbError.message });
-}
-
-}
+  }
+};
 
 export const enviarCorreo = async (req, res) => {
   const { correo, codigo, nombre } = req.body;
   // Configura el transporte de correo
   const transporter = nodemailer.createTransport({
-    service: 'Gmail',
+    service: "Gmail",
     auth: {
-      user: 'repositorioayd@gmail.com',
-      pass: 'crok zxgf ychi cxtj',
+      user: "repositorioayd@gmail.com",
+      pass: "crok zxgf ychi cxtj",
     },
   });
 
   const mailOptions = {
-    from: 'repositorioayd@gmail.com',
+    from: "repositorioayd@gmail.com",
     to: correo,
-    subject: 'Solicitud Aceptada',
-    text: 'Tu solicitud ha sido aceptada. Envia tu archivo a traves de este link: https://repositoriosistemas.netlify.app/enviar.',
+    subject: "Solicitud Aceptada",
+    text: "Tu solicitud ha sido aceptada. Envia tu archivo a traves de este link: https://repositoriosistemas.netlify.app/enviar.",
   };
 
   const [resultsubida] = await pool.query(
-    'UPDATE solicitud SET estado = 1 WHERE codigousuario = ?',
+    "UPDATE solicitud SET estado = 1 WHERE codigousuario = ?",
     [codigo]
-);
-
+  );
 
   try {
     await transporter.sendMail(mailOptions);
-    res.status(200).json({ message: 'Correo enviado exitosamente' });
+    res.status(200).json({ message: "Correo enviado exitosamente" });
   } catch (error) {
-    console.error('Error al enviar el correo:', error);
-    res.status(500).json({ message: 'Error al enviar el correo' });
+    console.error("Error al enviar el correo:", error);
+    res.status(500).json({ message: "Error al enviar el correo" });
   }
 };
 
-
-export const subirArchivo = async (req, res) =>{
+export const subirArchivo = async (req, res) => {
   const { codigo, archivo } = req.body;
 
-  const [rows] = await pool.query('SELECT * FROM solicitud WHERE codigousuario = ?', [codigo]);
+  const [rows] = await pool.query(
+    "SELECT * FROM solicitud WHERE codigousuario = ?",
+    [codigo]
+  );
 
   if (rows.length === 0) {
-    return res.status(404).json({ message: 'El código no esta en la base de datos' });
+    return res
+      .status(404)
+      .json({ message: "El código no esta en la base de datos" });
   }
-  
+
   const [resultsubida] = await pool.query(
-    'UPDATE solicitud SET archivo = ? WHERE codigousuario = ?',
+    "UPDATE solicitud SET archivo = ? WHERE codigousuario = ?",
     [archivo, codigo]
   );
 
-  res.status(200).json({ message: 'Archivo subido con éxito' });
+  res.status(200).json({ message: "Archivo subido con éxito" });
+};
 
-}
+export const rachazarSolicitud = async (req, res) => {
+  const codigousuario = req.body;
 
-export const rachazarSolicitud = async (req, res)=>{
+  try {
+    await pool.query("DELETE FROM solicitud WHERE codigousuario = ?", [codigousuario]);
 
-  const codigo = req.body;
+    res.status(200).json({ message: "Eliminado con éxito" });
+  } catch (error) {
+    console.error("Error al eliminar los datos:", error);
 
-    try {
-        // Iniciar una transacción
-        await pool.query('START TRANSACTION');
+    // Revertir la transacción en caso de error
+    await pool.query("ROLLBACK");
 
-        // Eliminar los documentos asociados al tipodocumento
-        await pool.query('DELETE FROM solicitud WHERE codigousuario = ?', [codigo]);
-
-        // Confirmar la transacción
-        await pool.query('COMMIT');
-
-        res.status(200).json({ message: 'Eliminado con éxito' });
-    } catch (error) {
-        console.error('Error al eliminar los datos:', error);
-
-        // Revertir la transacción en caso de error
-        await pool.query('ROLLBACK');
-
-        // Manejo genérico de otros errores de base de datos
-        const dbError = new Error('Error interno del servidor al realizar la consulta');
-        return res.status(500).json({ message: dbError.message });
-    }
-
-}
+    // Manejo genérico de otros errores de base de datos
+    const dbError = new Error(
+      "Error interno del servidor al realizar la consulta"
+    );
+    return res.status(500).json({ message: dbError.message });
+  }
+};
