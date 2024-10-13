@@ -359,7 +359,7 @@ export const enviarCorreo = async (req, res) => {
     from: 'repositorioayd@gmail.com',
     to: correo,
     subject: 'Solicitud Aceptada',
-    text: 'Tu solicitud ha sido aceptada. Envia tu archivo a traves de este link: http://localhost:5173/enviar.',
+    text: 'Tu solicitud ha sido aceptada. Envia tu archivo a traves de este link: https://repositoriosistemas.netlify.app/enviar.',
   };
 
   const [resultsubida] = await pool.query(
