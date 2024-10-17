@@ -34,17 +34,18 @@ export const insertarDocumento = async (req, res) => {
     let semestre = req.body.semestre;
     let estado = req.body.estado;//0 inactivo 1 activo
     let fechasubida = `${año}-${mes}-${dia}`;
+    let nombreCategoria = req.body.categoriaNombre;
     console.log(req.body);
     try {
         // Consulta de actualización
         const [resultsubida] = await pool.query(
-            'INSERT INTO documento (nombre,tipodocumento,descripcion,miembros,archivos,estado,fechaSubida,semestre) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-            [nombre, tipodocumento, descripcion, miembros, archivos, estado, fechasubida, semestre]
+            'INSERT INTO documento (nombre,tipodocumento,descripcion,miembros,archivos,estado,fechaSubida,semestre,nombreCategoria) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [nombre, tipodocumento, descripcion, miembros, archivos, estado, fechasubida, semestre, nombreCategoria]
         );
 
 
 
-        res.status(200).json({ message: 'Documento insertado con éxito', nombre, tipodocumento, descripcion, miembros, archivos, estado, fechasubida, semestre });
+        res.status(200).json({ message: 'Documento insertado con éxito', nombre, tipodocumento, descripcion, miembros, archivos, estado, fechasubida, semestre, nombreCategoria });
     } catch (error) {
         console.error('Error al subir documento:', error);
 
