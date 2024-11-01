@@ -1,9 +1,8 @@
 import { pool } from "../db.js";
 import databaseError from "../middlewares/error.js";
 import nodemailer from "nodemailer";
-import {SECRET_KEY} from '../config.js';
-import jwt from 'jsonwebtoken';
-
+import { SECRET_KEY } from "../config.js";
+import jwt from "jsonwebtoken";
 
 //Login
 export const Postlogin = async (req, res) => {
@@ -19,7 +18,7 @@ export const Postlogin = async (req, res) => {
     const code = req.body.codigo;
     const user = req.body.correo;
     const pass = req.body.contrasena;
-    
+
     const results = await connection.query(
       "SELECT * FROM administrador WHERE codigo = ? AND correo = ? AND contrasena = ?",
       [code, user, pass]
@@ -34,36 +33,34 @@ export const Postlogin = async (req, res) => {
       fotoPerfil = results[0][0].fotoPerfil;
       console.log("Autenticación exitosa");
       //borrable a futuro el isadmin
-      const token = jwt.sign(
-        {nombre, correo}, 
-        SECRET_KEY,
-        {
-          expiresIn: '1h'
-        } );
-      res
-      .cookie('access_token', token,{
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 1000 * 60 * 60
-      })
-      .status(200).json({
-        message: "loggeado con éxito",
-        autenticado: autenticado,
-        nombre: nombre,
-        correo: correo,
-        codigo: codigo,
-        fotoPerfil: fotoPerfil,
-        token
+      const token = jwt.sign({ nombre, correo }, SECRET_KEY, {
+        expiresIn: "1h",
       });
+      res
+        .cookie("access_token", token, {
+          domain: "https://repositoriosistemas.netlify.app", 
+          secure: process.env.NODE_ENV === "production", // Solo en producción
+          sameSite: "lax", // Ajuste de sameSite para producción
+          maxAge: 1000 * 60 * 60, // 1 hora
+          httpOnly: true,
+        })
+        .status(200)
+        .json({
+          message: "loggeado con éxito",
+          autenticado: autenticado,
+          nombre: nombre,
+          correo: correo,
+          codigo: codigo,
+          fotoPerfil: fotoPerfil,
+          token,
+        });
     } else {
       // Las credenciales son incorrectas
       console.log("Credenciales incorrectas");
-      res
-        .status(401)
-        .json({
-          message: "Credenciales incorrectas",
-          autenticado: autenticado,
-        });
+      res.status(401).json({
+        message: "Credenciales incorrectas",
+        autenticado: autenticado,
+      });
     }
   } catch (error) {
     console.error("Error de consulta:", error);
@@ -457,10 +454,12 @@ export const subirArchivo = async (req, res) => {
 };
 
 export const rachazarSolicitud = async (req, res) => {
-  const { codigousuario } = req.body; 
+  const { codigousuario } = req.body;
   console.log(codigousuario);
   try {
-    await pool.query("DELETE FROM solicitud WHERE codigousuario = ?", [codigousuario]);
+    await pool.query("DELETE FROM solicitud WHERE codigousuario = ?", [
+      codigousuario,
+    ]);
 
     res.status(200).json({ message: "Eliminado con éxito" });
   } catch (error) {
@@ -476,4 +475,3 @@ export const rachazarSolicitud = async (req, res) => {
     return res.status(500).json({ message: dbError.message });
   }
 };
-
