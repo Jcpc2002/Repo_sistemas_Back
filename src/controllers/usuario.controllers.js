@@ -41,7 +41,6 @@ export const Postlogin = async (req, res) => {
           secure: true, // Necesario para sameSite: "none" en producción
           sameSite: "none", // Permitir cookies cross-site
           maxAge: 1000 * 60 * 60, // 1 hora
-          httpOnly: true,
         })
         .status(200)
         .json({
