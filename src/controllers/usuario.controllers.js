@@ -43,7 +43,7 @@ export const Postlogin = async (req, res) => {
       res
       .cookie('access_token', token,{
         secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        sameSite: 'lax',
         maxAge: 1000 * 60 * 60
       })
       .status(200).json({
