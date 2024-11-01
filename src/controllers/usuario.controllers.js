@@ -38,9 +38,8 @@ export const Postlogin = async (req, res) => {
       });
       res
         .cookie("access_token", token, {
-          domain: "https://repositoriosistemas.netlify.app", 
-          secure: process.env.NODE_ENV === "production", // Solo en producción
-          sameSite: "lax", // Ajuste de sameSite para producción
+          secure: true, // Necesario para sameSite: "none" en producción
+          sameSite: "none", // Permitir cookies cross-site
           maxAge: 1000 * 60 * 60, // 1 hora
           httpOnly: true,
         })
