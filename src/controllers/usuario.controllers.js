@@ -1,6 +1,9 @@
 import { pool } from "../db.js";
 import databaseError from "../middlewares/error.js";
 import nodemailer from "nodemailer";
+import {SECRET_KEY} from '../config.js';
+import jwt from 'jsonwebtoken';
+
 
 //Login
 export const Postlogin = async (req, res) => {
@@ -16,6 +19,7 @@ export const Postlogin = async (req, res) => {
     const code = req.body.codigo;
     const user = req.body.correo;
     const pass = req.body.contrasena;
+    
     const results = await connection.query(
       "SELECT * FROM administrador WHERE codigo = ? AND correo = ? AND contrasena = ?",
       [code, user, pass]
@@ -30,14 +34,26 @@ export const Postlogin = async (req, res) => {
       fotoPerfil = results[0][0].fotoPerfil;
       console.log("Autenticación exitosa");
       //borrable a futuro el isadmin
-
-      res.status(200).json({
+      const token = jwt.sign(
+        {nombre, correo}, 
+        SECRET_KEY,
+        {
+          expiresIn: '1h'
+        } );
+      res
+      .cookie('access_token', token,{
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 1000 * 60 * 60
+      })
+      .status(200).json({
         message: "loggeado con éxito",
         autenticado: autenticado,
         nombre: nombre,
         correo: correo,
         codigo: codigo,
         fotoPerfil: fotoPerfil,
+        token
       });
     } else {
       // Las credenciales son incorrectas
