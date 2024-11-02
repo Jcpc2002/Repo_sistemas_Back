@@ -8,6 +8,7 @@ import{categoria,editarCategoria,editarDocumento,
     eliminarCategoria,traerCategoriasPorId} from "../controllers/documento.controllers.js"
 import {incrementarVisitas} from "../controllers/index.controller.js"
 //import EnviarSolicitud from "../../../Front-soft/src/pages/EnviarSolicitud.jsx";
+import authenticateToken from "../middlewares/authenticateToken.js";
 const router = Router()
 
 router.post('/login', Postlogin) //login
@@ -58,4 +59,8 @@ router.put('/subirArchivo',subirArchivo)//el usuario particular sube un archivo 
 
 router.delete('/rechazarSolicitud',rachazarSolicitud)//el admin rechaza una solicitud
 
+router.get('/auth/check',authenticateToken, (req, res) => {
+    // Si llega aquí, significa que el token es válido
+    res.json({ message: "Token válido", user: req.user });
+  });
 export default router
