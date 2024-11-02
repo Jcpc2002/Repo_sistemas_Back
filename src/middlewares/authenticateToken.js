@@ -5,6 +5,7 @@ const authenticateToken = (req, res, next) => {
   const token = req.cookies.access_token; // Obtén el token de la cookie
 
   if (!token) {
+    console.log(token)
     return res.status(401).json({ message: "No autenticado" });
   }
 
