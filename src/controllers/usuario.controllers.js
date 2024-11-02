@@ -39,7 +39,7 @@ export const Postlogin = async (req, res) => {
       res
         .cookie("access_token", token, {
           secure: true, // Necesario para HTTPS
-          sameSite: "strict", // Necesario para permitir cookies en diferentes dominios
+          sameSite: "lax", // Necesario para permitir cookies en diferentes dominios
           httpOnly: true,
         })
         .status(200)
