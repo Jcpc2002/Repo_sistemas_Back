@@ -3,9 +3,9 @@ import usuariosRutas from './routes/usuarios.routes.js'
 import indexRoutes from './routes/index.routes.js'
 import cors from 'cors'
 import cookieParser from 'cookie-parser';
-app.use(cookieParser());
-const app = express()
 
+const app = express()
+app.use(cookieParser());
 
 
 app.use(express.json())
