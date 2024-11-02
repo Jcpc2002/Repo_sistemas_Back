@@ -3,13 +3,13 @@ import usuariosRutas from './routes/usuarios.routes.js'
 import indexRoutes from './routes/index.routes.js'
 import cors from 'cors'
 import cookieParser from 'cookie-parser';
-
+app.use(cookieParser());
 const app = express()
 
 
 
 app.use(express.json())
-app.use(cookieParser());
+
 app.use(cors({
     origin: ['https://repositoriosistemas.netlify.app', 'http://localhost:5173'], // Solo permite solicitudes de este origen
     credentials: true // Habilita el envío de cookies desde el frontend
