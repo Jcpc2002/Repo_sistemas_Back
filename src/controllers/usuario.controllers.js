@@ -41,7 +41,6 @@ export const Postlogin = async (req, res) => {
           secure: true, // Necesario para HTTPS
           sameSite: "none", // Necesario para permitir cookies en diferentes dominios
           httpOnly: true,
-          domain: ".netlify.app",
         })
         .status(200)
         .json({

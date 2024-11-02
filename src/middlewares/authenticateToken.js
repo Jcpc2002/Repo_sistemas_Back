@@ -5,10 +5,7 @@ const authenticateToken = (req, res, next) => {
     console.log("Cookies:", req.cookies); // Añade esta línea para depurar
     const token = req.cookies.access_token; // Obtén el token de la cookie
   
-    if (!token) {
-      console.log("No token found");
-      return res.status(401).json({ message: "No autenticado" });
-    }
+   
   
     // Verifica el token
     jwt.verify(token, SECRET_KEY, (err, user) => {
