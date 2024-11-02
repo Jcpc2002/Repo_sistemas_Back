@@ -38,8 +38,8 @@ export const Postlogin = async (req, res) => {
       });
       res
         .cookie("access_token", token, {
-          secure: true, // Necesario para sameSite: "none" en producción
-          sameSite: "none", // Permitir cookies cross-site
+          secure: true,
+          sameSite: "strict", // Permitir cookies cross-site
           maxAge: 1000 * 60 * 60, // 1 hora
           httpOnly: true,
         })
