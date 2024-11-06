@@ -72,10 +72,15 @@ export const Postlogin = async (req, res) => {
 };
 
 export const logout = async (req, res) => {
-
-  res.clearCookie('access_token').json({message: 'Se cerró la sesion'})
-
-}
+  res
+    .clearCookie("access_token", {
+      secure: true,   
+      sameSite: "none",
+      httpOnly: true, 
+    })
+    .status(200)
+    .json({ message: "Se cerró la sesión" });
+};
 //Insertar usuario administrador
 export const postUsuarios = async (req, res) => {
   try {
