@@ -13,7 +13,7 @@ const router = Router()
 
 router.post('/login', Postlogin) //login
 
-router.post('/logout', logout) //cerrar sesion
+router.get('/logout', logout) //cerrar sesion
 
 router.post('/usuarios',postUsuarios)//inserta un usuario administrador
 
