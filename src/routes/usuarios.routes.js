@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {postUsuarios, Postlogin,editarDatos,
+import {postUsuarios, Postlogin,logout,editarDatos,
     editarContrasena,filtrarDocumentos
     ,filtrarDocumentosPorCategoria,filtrarDocumentoPorID,cantidadDeDocumentos,enviarSolicitud,traerSolicitudesPendientes,traerSolicitudesAceptadas,enviarCorreo, subirArchivo,rachazarSolicitud} from "../controllers/usuario.controllers.js"
 import {generarInforme} from "../controllers/pdf.controllers.js"
@@ -12,6 +12,8 @@ import authenticateToken from "../middlewares/authenticateToken.js";
 const router = Router()
 
 router.post('/login', Postlogin) //login
+
+router.post('/logout', logout) //cerrar sesion
 
 router.post('/usuarios',postUsuarios)//inserta un usuario administrador
 

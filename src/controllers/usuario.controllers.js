@@ -70,6 +70,12 @@ export const Postlogin = async (req, res) => {
     return res.status(500).json({ message: dbError.message });
   }
 };
+
+export const logout = async (req, res) => {
+
+  res.clearCookie('access_token').json({message: 'Se cerró la sesion'})
+
+}
 //Insertar usuario administrador
 export const postUsuarios = async (req, res) => {
   try {
