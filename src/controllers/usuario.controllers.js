@@ -345,7 +345,7 @@ export const cantidadDeDocumentos = async (req, res) => {
 
 export const enviarSolicitud = async (req, res) => {
   try {
-    const { nombre, codigousuario, correo, descripcion } = req.body;
+    const { nombre, codigousuario, correo, descripcion, nombreProyecto } = req.body;
     const estado = 0;
     // Verificar si el usuario ya envio una solicitud
     const [existingRows] = await pool.query(
@@ -360,8 +360,8 @@ export const enviarSolicitud = async (req, res) => {
 
     // Si no existe, proceder con la inserción
     const [rows] = await pool.query(
-      "INSERT INTO solicitud (nombre, codigousuario, descripcion,estado, correo) VALUES (?, ?, ?, ?, ?)",
-      [nombre, codigousuario, descripcion, estado, correo]
+      "INSERT INTO solicitud (nombre, codigousuario, descripcion,estado, correo, nombreproyecto) VALUES (?, ?, ?, ?, ?, ?)",
+      [nombre, codigousuario, descripcion, estado, correo, nombreProyecto]
     );
 
     res.status(200).json({ message: "Solicitud enviada" });
